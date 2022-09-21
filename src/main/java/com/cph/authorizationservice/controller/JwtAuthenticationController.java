@@ -2,6 +2,7 @@ package com.cph.authorizationservice.authorizationservice.controller;
 
 import java.util.Objects;
 
+import com.cph.authorizationservice.model.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -45,6 +46,18 @@ public class JwtAuthenticationController {
         final String token = jwtTokenUtil.generateToken(userDetails);
 
         return ResponseEntity.ok(new JwtResponse(token));
+    }
+
+    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    public ResponseEntity<?> saveUser(@RequestBody UserDTO user) throws Exception {
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        System.out.println("HELLO ");
+        System.out.println(user.toString());
+        System.out.println();
+        System.out.println();
+        return ResponseEntity.ok(userDetailsService.save(user));
     }
 
     private void authenticate(String username, String password) throws Exception {
