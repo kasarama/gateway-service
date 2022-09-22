@@ -1,0 +1,42 @@
+@startuml
+
+title Searching for Media
+
+autonumber 11
+
+boundary "GateWayService" as GA
+box "MediaService" #E3F2FD
+control "SearchController" as SC
+control "ProductService " as PS
+control "ElasticsearchOperations" as ES
+end box
+
+database "Data Base" as DB
+
+GA -> SC : GET /search with q parameter
+activate SC #DarkSeaGreen
+  autonumber 11.1
+  SC -> PS : searchForProduct(q) 
+  activate PS #DarkSeaGreen
+  
+    PS -> ES : searchForProduct(q
+    activate ES #DarkSeaGreen
+    
+      ES -> DB : Query
+      activate DB #DarkSeaGreen
+      DB -> ES : data
+      deactivate DB
+      
+    ES -> PS : SearchResultsDto
+    deactivate ES
+  
+  PS -> SC : SearchResultsDto
+  deactivate PS
+autonumber 12
+SC -> GA : SearchResultsDto
+
+deactivate SC
+
+
+
+@enduml

@@ -1,0 +1,88 @@
+@startuml
+
+title Searching for Programs with JWT validation
+
+autonumber
+
+boundary "Client" as CL
+
+
+box Gateway-Service #FFFFEE
+    control "JwtRequestFilter\n Extends\n OncePErRequestFilter" as RF
+    control "ProgramController" as PC
+    control "JwtUserDetail\n Extends\n UserDetailService" as US
+    control "JwtTokenUtil" as TU
+    control "ServiceDispatcher" as SD
+end box
+
+database "UserRegistration" as DB
+
+box ProgramService #E3F2FD
+    boundary "MediaService" as PS
+end box
+
+CL -> RF : GET /search\n JWT in header\n q: query in request parameter
+    activate RF #DarkSeaGreen
+
+        alt Token is present
+           
+            RF -> RF : "Check if request has token"
+
+        ELSE No token
+            RF -> CL : HTTP STATUS CODE 401 
+        end
+            
+        
+        RF -> US : Load User Details using the username\n loadUserByUserName(userName)
+        activate US #DarkSeaGreen
+        
+        US -> RF : Return UserDetails
+        
+        deactivate US
+        
+        RF -> TU : Validate the JwtToken
+        activate TU #DarkSeaGreen 
+        
+        alt Token is valid
+            TU -> RF : return true
+            
+            RF -> RF : Configure Spring Security for the user
+            
+            RF -> PC : search(q) method with /search mapping is called
+            activate PC #DarkSeaGreen
+            
+            PC -> SD : search(q) method with search query is called
+            
+            activate SD #DarkSeaGreen
+
+            SD -> PS : GET request is sent\n with query parameter
+            activate PS #DarkSeaGreen
+            
+            alt Response OK        
+                    PS -> SD : Return SearchResultsDto
+                     
+                    
+                    SD -> PC : Return SearchResultsDto
+                    
+                    deactivate SD
+                    PC -> CL : Return SearchResultsDto
+                    deactivate PC
+            else Exception
+                PS -> CL : HTTP STATUS CODE > 299
+              deactivate PS      
+            end
+            
+
+        Else token is invalid
+           TU -> RF : return false
+            deactivate TU
+           RF -> CL : HTTP STATUS CODE 401 
+        end
+
+            
+        
+        
+
+    deactivate RF
+
+@enduml

@@ -13,7 +13,7 @@ public class ProgramController {
     ServiceDispatcher serviceDispatcher;
 
     @RequestMapping({ "/search" })
-    public SearchResultsDto firstPage(@RequestParam String q)
+    public SearchResultsDto search(@RequestParam String q)
     {
         return serviceDispatcher.searchPrograms(q);
     }
