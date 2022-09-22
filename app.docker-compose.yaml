@@ -1,0 +1,5 @@
+version: "3.2"
+
+services:
+  api-gateway:
+    image: tobiaszimmer/api-gateway:main
